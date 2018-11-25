@@ -3,7 +3,7 @@ This lab uses Dr. Freudenthal's code to implement Producer Consumer behavior
 using threads.
 
 # Steps:
-Just run PCLab.py
+Simply run PCLab.py
 
 ## File List
 ### ExtractFrames.py
@@ -16,6 +16,9 @@ and sends them to an output buffer.
 
 ### PCDisplay.py
 Loads a series of frames sequently from a buffer and displays them with a 42ms delay.
+
+### PCQueue.py
+Custom queue class that takes a lock and a size to handle production storage.
 
 ### PCLab.py
 Runs previous classes as threads and sends shared input and output buffer queues for 

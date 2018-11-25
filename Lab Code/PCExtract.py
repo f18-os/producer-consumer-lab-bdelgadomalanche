@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
 
+from PCQueue import *
 import threading
 import cv2
 import numpy as np
 import base64
-import queue
 import time
 
 class extractFrames(threading.Thread):
-    def __init__(self, lock, fileName, outputBuffer):
+    def __init__(self, fileName, outputBuffer):
         threading.Thread.__init__(self)
-        self.lock = lock
         self.fileName = fileName
         self.outputBuffer = outputBuffer
         
@@ -32,20 +31,17 @@ class extractFrames(threading.Thread):
             #encode the frame as base 64 to make debugging easier
             jpgAsText = base64.b64encode(jpgImage)
 
+            #Wait for 50ms if queue is full
+            while self.outputBuffer.full():
+                time.sleep(.05)
+
             # add the frame to the buffer
             self.outputBuffer.put(jpgAsText)
         
             success,image = vidcap.read()
             print('Reading frame {} {}'.format(count, success))
             count += 1
-            
-            #if queue is at 10 wait to add items
-            self.lock.acquire()
-            while self.outputBuffer.qsize() > 10:
-                self.lock.release()
-                time.sleep(.05)
-                self.lock.acquire()
-            self.lock.release()
 
         print("Frame extraction complete")
+        #Finished production flag
         self.outputBuffer.put(None)

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import threading
+import PCQueue
 from PCExtract import *
 from PCConvert import *
 from PCDisplay import *
@@ -10,13 +11,13 @@ filename = 'clip.mp4'
 
 lock = threading.Lock()
 
-# shared queue  
-extractionQueue = queue.Queue()
-convertionQueue = queue.Queue()
+# shared queues
+extractionQueue = PCQueue(10, lock)
+convertionQueue = PCQueue(10, lock)
 
-extractionThread = extractFrames(lock,filename,extractionQueue)
-conversionThread = convertFrames(lock,extractionQueue,convertionQueue)
-displayThread = displayFrames(lock,convertionQueue)
+extractionThread = extractFrames(filename,extractionQueue)
+conversionThread = convertFrames(extractionQueue,convertionQueue)
+displayThread = displayFrames(convertionQueue)
 
 conversionThread.start()
 extractionThread.start()
